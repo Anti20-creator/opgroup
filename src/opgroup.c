@@ -6,10 +6,9 @@
 
 #define INFILE "vdb.data"
 
-/* valamiért segfaultol
 int count_records()
 {
-    FILE* file = fopen(INFILE, 'r');
+    FILE* file = fopen(INFILE, "r");
     if (!file) return -1;
 
     char* line = NULL;
@@ -27,11 +26,10 @@ int count_records()
 
     return result;
 }
-*/
 
-int mark_vaccinated(int n, char* path_to_file)
+int mark_vaccinated(int n)
 {
-    FILE *datafile = fopen(path_to_file, 'r');
+    FILE *datafile = fopen(INFILE, "r");
     if (!datafile)
         return 1;
 
@@ -47,19 +45,20 @@ int mark_vaccinated(int n, char* path_to_file)
     {
         if (idx == n)
         {
-            fprintf(tempfile, "[OLTVA] %s", line);
+            fprintf(tempfile, "[OLTVA]\t%s", line);
         }
         else
         {
             fprintf(tempfile, "%s", line);
         }
+        ++idx;
     }
 
     free(line);
     fclose(datafile);
     fclose(tempfile);
 
-    remove(datafile);
+    remove(INFILE);
     rename(".temp.data", INFILE);
 
     return 0;
@@ -89,21 +88,8 @@ int main()
 
     do 
     {
-        count = 0;
-
-        FILE* file = fopen(INFILE, "r");
-        char* line = NULL;
-        size_t len = 0;
-        
-        while ((getline(&line, &len, file)) != -1)
-        {
-            if (strcmp("[OLTVA]", line, 7))
-                ++count;
-        }
-        fclose(file);
-        free(line);
-        
-        // count = count_records();
+        count = count_records();
+        if (mark_vaccinated(2) == 2) printf("temp open failed\n");
         
         if (count < 5)
         {
@@ -146,7 +132,7 @@ int main()
             }  
         }
     }
-    while (count > 4);
+    while ( false );// count > 4);
 
     return 0;
 }
